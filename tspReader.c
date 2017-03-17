@@ -136,7 +136,6 @@ TspInfo* read(FILE *file){
         //Data part
         else if(!strcmp(line, "NODE_COORD_SECTION\n") || !strcmp(line, "EDGE_WEIGHT_SECTION\n"))
         {
-
             //Check if some needed specification is invalid or undefined
             if(strcmp(tspInfo->type, "TSP") != 0 ||
                tspInfo->dimension < 2 ||
@@ -163,14 +162,17 @@ TspInfo* read(FILE *file){
                 }
 
                 tspInfo->distances = (double**) malloc(sizeof(double*) * tspInfo->dimension);
+                for(i = 0; i < tspInfo->dimension; ++i){
+                    tspInfo->distances[i] = (double*) malloc(sizeof(double) * tspInfo->dimension);
+                }
                 for(i = 0; i < tspInfo->dimension; ++i)
                 {
 
-                    tspInfo->distances[i] = (double*) malloc(sizeof(double) * tspInfo->dimension);
                     for(j = 0; j < tspInfo->dimension; ++j)
                     {
 
                         tspInfo->distances[i][j] = calcDistance(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
+                        tspInfo->distances[j][i] = tspInfo->distances[i][j];
 
                     }
                 }
@@ -182,6 +184,10 @@ TspInfo* read(FILE *file){
             {
 
                 tspInfo->distances = (double**) malloc(sizeof(double*) * tspInfo->dimension);
+                for(i = 0; i < tspInfo->dimension; ++i){
+                    tspInfo->distances[i] = (double*) malloc(sizeof(double) * tspInfo->dimension);
+                }
+
                 for(i = 0; i < tspInfo->dimension; ++i)
                 {
 
@@ -190,6 +196,7 @@ TspInfo* read(FILE *file){
                     {
 
                         fscanf(file, "%lf ", &tspInfo->distances[i][j]);
+                        tspInfo->distances[j][i] = tspInfo->distances[i][j];
 
                     }
 
