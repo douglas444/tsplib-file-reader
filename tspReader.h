@@ -4,7 +4,6 @@
 struct tspInfo {
 
     char *name,
-         *comment,
          *type,
          *edge_weight_format,
          *edge_weight_type;
@@ -16,7 +15,6 @@ struct tspInfo {
 };
 
 typedef struct tspInfo TspInfo;
-
 
 void freeTspInfo(TspInfo *tspInfo);
 TspInfo* read(FILE *file);

@@ -9,9 +9,6 @@ void freeTspInfo(TspInfo *tspInfo){
     if(tspInfo->name != NULL) {
         free(tspInfo->name);
     }
-    if(tspInfo->comment != NULL) {
-        free(tspInfo->comment);
-    }
     if(tspInfo->type != NULL) {
         free(tspInfo->type);
     }
@@ -29,10 +26,37 @@ void freeTspInfo(TspInfo *tspInfo){
     }
 }
 
-void readSpecification(char *line, char **keyword, char **value){
+void readSpecification(char *entry, char **keyword, char **value){
 
-    int divisionIndex;
-    char *divisionPointer = strstr(line, " : "), *temp;
+    int divisionIndex, i, j, count;
+    char *line, *divisionPointer, *temp;
+
+    count = 0;
+
+    //Count space chars in the entry
+    for(i = 0; i < strlen(entry); ++i){
+        if(entry[i] == ' '){
+            ++count;
+        }
+    }
+
+    line = (char*) malloc(sizeof(char) * (strlen(entry) - count));
+
+    j = 0;
+
+    //Copy the entry without spaces chars to the line array
+    for(i = 0; i < strlen(entry) - count; ++i){
+
+        while(entry[j] == ' '){
+            ++j;
+        }
+
+        line[i] = entry[j];
+        ++j;
+
+    }
+
+    divisionPointer = strstr(line, ":");
 
     if(divisionPointer != NULL){
 
@@ -41,9 +65,11 @@ void readSpecification(char *line, char **keyword, char **value){
         *keyword = (char*) malloc(sizeof(char) * divisionIndex);
         strncpy(*keyword, line, divisionIndex);
 
-        temp = (char*) malloc(sizeof(char) * (strlen(line) - strlen(*keyword) - strlen(" : ")));
-        strcpy(temp, &line[divisionIndex + 3]);
 
+        temp = (char*) malloc(sizeof(char) * (strlen(line) - strlen(*keyword) - strlen(":")));
+        strcpy(temp, &line[divisionIndex + strlen(":")]);
+
+        //temp contains the vlue string with a \n in the end
         *value = (char*) malloc(sizeof(char) * (strlen(temp) - 1));
         strncpy(*value, temp, strlen(temp) - 1);
     }
@@ -75,7 +101,6 @@ TspInfo* read(FILE *file){
 
     tspInfo = (TspInfo*) malloc(sizeof(TspInfo));
     tspInfo->name = NULL;
-    tspInfo->comment = NULL;
     tspInfo->edge_weight_format = NULL;
     tspInfo->edge_weight_type = NULL;
     tspInfo->distances = NULL;
@@ -84,7 +109,7 @@ TspInfo* read(FILE *file){
     while(getline(&line, &n, file) != -1){
 
         //Specification part
-        if(strstr(line, " : ") != NULL)
+        if(strstr(line, ":") != NULL)
         {
 
             readSpecification(line, &keyword, &value);
@@ -122,12 +147,6 @@ TspInfo* read(FILE *file){
                 tspInfo->name = (char*) malloc(sizeof(char) * strlen(value));
                 strcpy(tspInfo->name, value);
 
-            }
-            else if(strcmp("COMMENT", keyword) == 0)
-            {
-
-                tspInfo->comment = (char*) malloc(sizeof(char) * strlen(value));
-                strcpy(tspInfo->comment, value);
             }
 
 
@@ -167,7 +186,6 @@ TspInfo* read(FILE *file){
                 }
                 for(i = 0; i < tspInfo->dimension; ++i)
                 {
-
                     for(j = 0; j < tspInfo->dimension; ++j)
                     {
 
@@ -190,8 +208,6 @@ TspInfo* read(FILE *file){
 
                 for(i = 0; i < tspInfo->dimension; ++i)
                 {
-
-                    tspInfo->distances[i] = (double*) malloc(sizeof(double) * tspInfo->dimension);
                     for(j = i + 1; j < tspInfo->dimension; ++j)
                     {
 

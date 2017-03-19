@@ -4,17 +4,28 @@
 
 int main()
 {
-    FILE *f = fopen("d657.tsp", "r");
+    int i, j;
+
+    FILE *f = fopen("brazil58.tsp", "r");
     TspInfo *tspInfo = read(f);
 
     printf("NAME : %s\n", tspInfo->name);
-    printf("COMMENT : ");
-    puts(tspInfo->comment);
     printf("TYPE : %s\n", tspInfo->type);
     printf("DIMENSION : %d\n", tspInfo->dimension);
     printf("EDGE_WEIGHT_TYPE : %s\n", tspInfo->edge_weight_type);
     if(tspInfo->edge_weight_format != NULL){
         printf("EDGE_WEIGHT_FORMAT : %s\n", tspInfo->edge_weight_format);
     }
+
+    for(i = 0; i < tspInfo->dimension; ++i){
+        for(j = i; j < tspInfo->dimension; ++j){
+            if(i != j)
+                printf("%2.lf ", tspInfo->distances[i][j]);
+            else
+                printf("X ");
+        }
+        printf("\n");
+    }
+
     return 0;
 }
