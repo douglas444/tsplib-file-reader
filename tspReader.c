@@ -158,7 +158,6 @@ TspInfo* read(FILE *file){
             //Check if some needed specification is invalid or undefined
             if(strcmp(tspInfo->type, "TSP") != 0 ||
                tspInfo->dimension < 2 ||
-               (strcmp(tspInfo->edge_weight_type, "EXPLICIT") != 0 && strcmp(tspInfo->edge_weight_type, "EUC_2D") != 0) ||
                (strcmp(tspInfo->edge_weight_type, "EXPLICIT") == 0 && strcmp(tspInfo->edge_weight_format, "UPPER_ROW") != 0)){
 
                 freeTspInfo(tspInfo);
