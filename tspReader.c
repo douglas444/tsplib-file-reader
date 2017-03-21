@@ -40,7 +40,7 @@ void readSpecification(char *entry, char **keyword, char **value){
         }
     }
 
-    line = (char*) malloc(sizeof(char) * (strlen(entry) - count));
+    line = (char*) malloc(sizeof(char) * (strlen(entry) - count + 1));
 
     j = 0;
 
@@ -55,24 +55,29 @@ void readSpecification(char *entry, char **keyword, char **value){
         ++j;
 
     }
-
+    line[strlen(entry) - count] = '\0';
     divisionPointer = strstr(line, ":");
 
     if(divisionPointer != NULL){
 
         divisionIndex = divisionPointer - line;
 
-        *keyword = (char*) malloc(sizeof(char) * divisionIndex);
+        *keyword = (char*) malloc(sizeof(char) * (divisionIndex + 1));
         strncpy(*keyword, line, divisionIndex);
+        (*keyword)[divisionIndex] = '\0';
 
-
-        temp = (char*) malloc(sizeof(char) * (strlen(line) - strlen(*keyword) - strlen(":")));
+        temp = (char*) malloc(sizeof(char) * (strlen(line) - strlen(*keyword) - strlen(":") + 1));
         strcpy(temp, &line[divisionIndex + strlen(":")]);
 
-        //temp contains the vlue string with a \n in the end
-        *value = (char*) malloc(sizeof(char) * (strlen(temp) - 1));
+        //temp contains the value string with a \n in the end
+        *value = (char*) malloc(sizeof(char) * (strlen(temp)));
         strncpy(*value, temp, strlen(temp) - 1);
+        (*value)[strlen(temp) -1] = '\0';
+
+        free(temp);
     }
+
+    free(line);
 
 }
 
@@ -171,28 +176,32 @@ TspInfo* read(FILE *file){
             {
 
                 coords = (double**) malloc(sizeof(double*) * tspInfo->dimension);
-                for(i = 0; i < tspInfo->dimension; ++i)
-                {
+                for(i = 0; i < tspInfo->dimension; ++i){
 
                     coords[i] = (double*) malloc(sizeof(double) * 2);
                     fscanf(file, "%d %lf %lf\n", &id, &coords[i][0], &coords[i][1]);
-
                 }
 
                 tspInfo->distances = (double**) malloc(sizeof(double*) * tspInfo->dimension);
                 for(i = 0; i < tspInfo->dimension; ++i){
+
                     tspInfo->distances[i] = (double*) malloc(sizeof(double) * tspInfo->dimension);
                 }
-                for(i = 0; i < tspInfo->dimension; ++i)
-                {
-                    for(j = 0; j < tspInfo->dimension; ++j)
-                    {
+
+                for(i = 0; i < tspInfo->dimension; ++i){
+
+                    for(j = 0; j < tspInfo->dimension; ++j){
 
                         tspInfo->distances[i][j] = calcDistance(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
                         tspInfo->distances[j][i] = tspInfo->distances[i][j];
 
                     }
                 }
+
+                for(i = 0; i < tspInfo->dimension; ++i){
+                    free(coords[i]);
+                }
+                free(coords);
 
             }
 
@@ -225,6 +234,14 @@ TspInfo* read(FILE *file){
         if(line != NULL){
             free(line);
             line = NULL;
+        }
+        if(keyword != NULL){
+            free(keyword);
+            keyword = NULL;
+        }
+        if(value != NULL){
+            free(value);
+            value = NULL;
         }
     }
 
