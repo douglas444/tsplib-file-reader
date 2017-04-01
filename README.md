@@ -15,8 +15,8 @@ This program loads data from a TSPLIB file to the structure indicated below.
     };
 
 
-Supported types: TSP<br/>
+Supported types: TSP, ATSP<br/>
 Supported edge weight types: EXPLICIT, EUC_2D<br/>
-Supported edge weight format: UPPER_ROW<br/>
+Supported edge weight format: UPPER_ROW, LOWER_ROW, UPPER_DIAG_ROW, LOWER_DIAG_ROW, FULL_MATRIX<br/>
 
 

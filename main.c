@@ -6,7 +6,7 @@ int main()
 {
     int i, j;
 
-    FILE *f = fopen("brazil58.tsp", "r");
+    FILE *f = fopen("../gr17.tsp", "r");
     TspInfo *tspInfo = read(f);
 
     printf("NAME : %s\n", tspInfo->name);
@@ -18,11 +18,11 @@ int main()
     }
 
     for(i = 0; i < tspInfo->dimension; ++i){
-        for(j = i; j < tspInfo->dimension; ++j){
+        for(j = 0; j < tspInfo->dimension; ++j){
             if(i != j)
-                printf("%2.lf ", tspInfo->distances[i][j]);
+                printf("\t%2.lf ", tspInfo->distances[i][j]);
             else
-                printf("X ");
+                printf("\tXXX ");
         }
         printf("\n");
     }

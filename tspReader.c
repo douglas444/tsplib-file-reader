@@ -160,13 +160,23 @@ TspInfo* read(FILE *file){
         //Data part
         else if(!strcmp(line, "NODE_COORD_SECTION\n") || !strcmp(line, "EDGE_WEIGHT_SECTION\n"))
         {
-            //Check if some needed specification is invalid or undefined
-            if(strcmp(tspInfo->type, "TSP") != 0 ||
-               tspInfo->dimension < 2 ||
-               (strcmp(tspInfo->edge_weight_type, "EXPLICIT") == 0 && strcmp(tspInfo->edge_weight_format, "UPPER_ROW") != 0)){
+
+            //Check if the specifications formatis supported
+            if((strcmp(tspInfo->type, "TSP") != 0 && strcmp(tspInfo->type, "ATSP") != 0) ||
+
+               (strcmp(tspInfo->edge_weight_type, "EXPLICIT") != 0 &&
+                strcmp(tspInfo->edge_weight_type, "EUC_2D") != 0) ||
+
+               (strcmp(tspInfo->edge_weight_type, "EXPLICIT") == 0 &&
+                strcmp(tspInfo->edge_weight_format, "UPPER_ROW") != 0 &&
+                strcmp(tspInfo->edge_weight_format, "LOWER_ROW") != 0 &&
+                strcmp(tspInfo->edge_weight_format, "UPPER_DIAG_ROW") != 0 &&
+                strcmp(tspInfo->edge_weight_format, "LOWER_DIAG_ROW") != 0 &&
+                strcmp(tspInfo->edge_weight_format, "FULL_MATRIX") != 0))
+            {
 
                 freeTspInfo(tspInfo);
-                printf("Error: Invalid specifications\n");
+                printf("Error: Unsupported specifications\n");
                 exit(1);
 
             }
@@ -206,7 +216,7 @@ TspInfo* read(FILE *file){
             }
 
             //For explicit matrix
-            else
+            else if(!strcmp(line, "EDGE_WEIGHT_SECTION\n"))
             {
 
                 tspInfo->distances = (double**) malloc(sizeof(double*) * tspInfo->dimension);
@@ -214,18 +224,71 @@ TspInfo* read(FILE *file){
                     tspInfo->distances[i] = (double*) malloc(sizeof(double) * tspInfo->dimension);
                 }
 
-                for(i = 0; i < tspInfo->dimension; ++i)
-                {
-                    for(j = i + 1; j < tspInfo->dimension; ++j)
+                //For UPPER_ROW and LOWER_ROW
+                if(strcmp(tspInfo->edge_weight_format, "UPPER_ROW") == 0 ||
+                    strcmp(tspInfo->edge_weight_format, "LOWER_ROW") == 0 ){
+
+                    for(i = 0; i < tspInfo->dimension; ++i)
                     {
+                        for(j = i + 1; j < tspInfo->dimension; ++j)
+                        {
 
-                        fscanf(file, "%lf ", &tspInfo->distances[i][j]);
-                        tspInfo->distances[j][i] = tspInfo->distances[i][j];
+                            fscanf(file, "%lf ", &tspInfo->distances[i][j]);
+                            tspInfo->distances[j][i] = tspInfo->distances[i][j];
 
+                        }
                     }
 
-                    fscanf(file, "\n");
                 }
+
+                //For FULL_MATRIX
+                else if(strcmp(tspInfo->edge_weight_format, "FULL_MATRIX") == 0){
+
+                    for(i = 0; i < tspInfo->dimension; ++i)
+                    {
+                        for(j = 0; j < tspInfo->dimension; ++j)
+                        {
+                            fscanf(file, "%lf ", &tspInfo->distances[i][j]);
+                        }
+                    }
+
+                //For LOWER_DIAG_ROW
+                }else if(strcmp(tspInfo->edge_weight_format, "LOWER_DIAG_ROW") == 0){
+
+                    for(i = 0; i < tspInfo->dimension; ++i)
+                    {
+                        for(j = 0; j < i + 1; ++j)
+                        {
+
+                            fscanf(file, "%lf ", &tspInfo->distances[i][j]);
+                            tspInfo->distances[j][i] = tspInfo->distances[i][j];
+
+                        }
+                    }
+
+                //For UPPER_DIAG_ROW
+                }else if(strcmp(tspInfo->edge_weight_format, "UPPER_DIAG_ROW") == 0 ){
+
+                    for(i = 0; i < tspInfo->dimension; ++i)
+                    {
+                        for(j = i; j < tspInfo->dimension; ++j)
+                        {
+
+                            fscanf(file, "%lf ", &tspInfo->distances[i][j]);
+                            tspInfo->distances[j][i] = tspInfo->distances[i][j];
+
+                        }
+                    }
+
+                }else{
+
+                    //edge_weight_format not supported
+
+                }
+
+            }else{
+
+                //data part format not supported
 
             }
 
