@@ -20,9 +20,7 @@ int main()
     for(i = 0; i < tspInfo->dimension; ++i){
         for(j = 0; j < tspInfo->dimension; ++j){
             if(i != j)
-                printf("\t%2.lf ", tspInfo->distances[i][j]);
-            else
-                printf("\tXXX ");
+                printf("%2.lf ", tspInfo->distances[i][j]);
         }
         printf("\n");
     }
